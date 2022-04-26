@@ -4,13 +4,13 @@
   const get = (element) => document.querySelector(element)
 
   class BrickBreak {
-    constructor(parent ='body', data = {}) {
+    constructor(parent = 'body', data = {}) {
       this.parent = get(parent)
       this.canvas = document.createElement('canvas')
       this.canvas.setAttribute('width', 480)
       this.canvas.setAttribute('height', 340)
       this.ctx = this.canvas.getContext('2d')
-      this.fontFamily = '20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu'
+      this.fontFamily = '20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu'
       this.score = 0
       this.lives = data.lives
       this.speed = data.speed
@@ -55,6 +55,14 @@
       this.draw()
     }
 
+    drawBall = () => {
+      this.ctx.beginPath()
+      this.ctx.arc(this.ballX, this.ballY, this.radius, 0, Math.PI * 2)
+      this.ctx.fillStyle = this.ballColor
+      this.ctx.fill()
+      this.ctx.closePath()
+    }
+
     draw = () => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -64,13 +72,20 @@
         this.canvas.height / 2 - this.image.height / 2
       )
       this.drawBall()
-      this.drawPaddle()
-      this.drawBricks()
-      this.drawScore()
-      this.drawLives()
-      this.detectCollision()
+      // this.drawPaddle()
+      // this.drawBricks()
+      // this.drawScore()
+      // this.drawLives()
+      // this.detectCollision()
       
+      this.ballX += this.directX
+      this.ballY += this.directY
+      requestAnimationFrame(this.draw)
     }
+
+    // reset = () => {
+    //   document.location.reload()
+    // }
   }
 
   const data = {
@@ -93,6 +108,6 @@
     brickPosY: 30,
   }
 
-  const brickBreak = new BrickBreak('canvas', data)
+  const brickBreak = new BrickBreak('.canvas', data)
   brickBreak.init()
 })()

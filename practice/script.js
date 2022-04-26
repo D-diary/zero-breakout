@@ -3,6 +3,10 @@
 
   const get = (element) => document.querySelector(element)
 
+  const keyEvent = (control, func) => {
+    document.addEventListener(control, func, false)
+  }
+
   class BrickBreak {
     constructor(parent = 'body', data = {}) {
       this.parent = get(parent)
@@ -51,8 +55,38 @@
           this.bricks[colIndex][rowIndex] = { x: 0, y: 0, status: 1 }
         }
       }
-      // this.keyEvent()
+      this.keyEvent()
       this.draw()
+    }
+
+    keyupEvent = (e) => {
+      if('Right' === e.key || 'ArrowRight' === e.key) {
+        this.rightPressed = false
+      } else if('Left' === e.key || 'ArrowLeft' === e.key){
+        this.leftPressed = false
+      }
+    }
+
+    keydownEvent = (e) => {
+      if('Right' === e.key || 'ArrowRight' === e.key) {
+        this.rightPressed = true
+      } else if('Left' === e.key || 'ArrowLeft' === e.key){
+        this.leftPressed = true
+      }
+    }
+
+    mousemoveEvent = (e) => {
+      const positionX = e.clientX - this.canvas.offsetLeft
+
+      if (0 < positionX && positionX < this.canvas.width) {
+        this.paddleX = positionX - this.paddleWidth / 2
+      }
+    }
+
+    keyEvent = () => {
+      keyEvent('keyup', this.keyupEvent)
+      keyEvent('keydown', this.keydownEvent)
+      keyEvent('mousemove', this.mousemoveEvent)
     }
 
     drawBall = () => {
@@ -125,19 +159,55 @@
       )
       this.drawBall()
       this.drawPaddle()
-      // this.drawBricks()
-      // this.drawScore()
-      // this.drawLives()
+      this.drawBricks()
+      this.drawScore()
+      this.drawLives()
       // this.detectCollision()
+
+      if (
+        this.ballX + this.directX > this.canvas.width - this.radius || this.ballX + this.directX < this.radius
+      ) {
+        this.directX = -this.directX
+      }
+
+      if(this.ballY + this.directY < this.radius) {
+        this.directY = -this.directY
+      } else if(this.ballY + this.directY > this.canvas.height - this.radius) {
+        
+        if (
+          this.ballX > this.paddleX &&
+          this.ballX < this.paddleX + this.paddleWidth
+          ) {
+          this.directY = -this.directY
+        } else {
+          this.lives--
+          if (0 === this.lives) {
+            alert('실패')
+            this.reset()
+          } else {
+            this.ballX = this.canvas.width / 2
+            this.ballY = this.canvas.height - this.paddleHeight
+            this.directX = this.speed
+            this.directY = -this.speed
+            this.paddleX = (this.canvas.width - this.paddleWidth) / 2
+          }
+        }
+      }
+
+      if(this.rightPressed && this.paddleX < this.canvas.width - this.paddleWidth) {
+        this.paddleX += 7
+      } else if (this.leftPressed && 0 < this.paddleX) {
+        this.paddleX -= 7
+      }
       
       this.ballX += this.directX
       this.ballY += this.directY
       requestAnimationFrame(this.draw)
     }
 
-    // reset = () => {
-    //   document.location.reload()
-    // }
+    reset = () => {
+      document.location.reload()
+    }
   }
 
   const data = {
